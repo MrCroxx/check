@@ -135,6 +135,31 @@ func (s *CheckersS) TestDeepEquals(c *check.C) {
 	testCheck(c, check.DeepEquals, false, "", &simpleStruct{1}, &simpleStruct{2})
 }
 
+func (s *CheckersS) TestEqualsIn(c *check.C) {
+	testInfo(c, check.EqualsIn, "EqualsIn", []string{"obtained", "expected"})
+
+	// The simplest.
+	testCheck(c, check.EqualsIn, true, "", 42, []interface{}{0, 42, -1})
+	testCheck(c, check.EqualsIn, false, "", 42, []interface{}{43})
+
+	// Different native types.
+	testCheck(c, check.EqualsIn, false, "", int32(42), []interface{}{0, int64(42), -1})
+
+	// With nil.
+	testCheck(c, check.EqualsIn, false, "", 42, []interface{}{nil})
+
+	// Slices
+	testCheck(c, check.EqualsIn, false, "runtime error: comparing uncomparable type []uint8", []byte{1, 2}, []interface{}{[]byte{1, 2}})
+
+	// Struct values
+	testCheck(c, check.EqualsIn, true, "", simpleStruct{1}, []interface{}{simpleStruct{1}})
+	testCheck(c, check.EqualsIn, false, "", simpleStruct{1}, []interface{}{simpleStruct{2}})
+
+	// Struct pointers
+	testCheck(c, check.EqualsIn, false, "", &simpleStruct{1}, []interface{}{&simpleStruct{1}})
+	testCheck(c, check.EqualsIn, false, "", &simpleStruct{1}, []interface{}{&simpleStruct{2}})
+}
+
 func (s *CheckersS) TestHasLen(c *check.C) {
 	testInfo(c, check.HasLen, "HasLen", []string{"obtained", "n"})
 

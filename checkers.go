@@ -204,6 +204,39 @@ func (checker *deepEqualsChecker) Check(params []interface{}, names []string) (r
 }
 
 // -----------------------------------------------------------------------
+// EqualsIn checker.
+
+type equalsInChecker struct {
+	*CheckerInfo
+}
+
+// The EqualsIn checker verifies that the obtained value is equal to
+// one of the expected values, according to usual Go semantics for ==.
+//
+// For example:
+//
+//     c.Assert(value, EqualsIn, []interface{}{42, "42"} )
+//
+var EqualsIn Checker = &equalsInChecker{
+	&CheckerInfo{Name: "EqualsIn", Params: []string{"obtained", "expected"}},
+}
+
+func (checker *equalsInChecker) Check(params []interface{}, names []string) (result bool, error string) {
+	defer func() {
+		if v := recover(); v != nil {
+			result = false
+			error = fmt.Sprint(v)
+		}
+	}()
+	for _, v := range params[1].([]interface{}) {
+		if params[0] == v {
+			return true, ""
+		}
+	}
+	return false, ""
+}
+
+// -----------------------------------------------------------------------
 // HasLen checker.
 
 type hasLenChecker struct {
