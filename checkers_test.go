@@ -160,6 +160,32 @@ func (s *CheckersS) TestEqualsIn(c *check.C) {
 	testCheck(c, check.EqualsIn, false, "", &simpleStruct{1}, []interface{}{&simpleStruct{2}})
 }
 
+func (s *CheckersS) TestDeepEqualsIn(c *check.C) {
+	testInfo(c, check.DeepEqualsIn, "DeepEqualsIn", []string{"obtained", "expected"})
+
+	// The simplest.
+	testCheck(c, check.DeepEqualsIn, true, "", 42, []interface{}{0, 42, -1})
+	testCheck(c, check.DeepEqualsIn, false, "", 42, []interface{}{43})
+
+	// Different native types.
+	testCheck(c, check.DeepEqualsIn, false, "", int32(42), []interface{}{0, int64(42), -1})
+
+	// With nil.
+	testCheck(c, check.DeepEqualsIn, false, "", 42, []interface{}{nil})
+
+	// Slices
+	testCheck(c, check.DeepEqualsIn, true, "", []byte{1, 2}, []interface{}{[]byte{0}, []byte{1, 2}, []byte{211}})
+	testCheck(c, check.DeepEqualsIn, false, "", []byte{1, 2}, []interface{}{[]byte{2, 1}})
+
+	// Struct values
+	testCheck(c, check.DeepEqualsIn, true, "", simpleStruct{1}, []interface{}{simpleStruct{1}})
+	testCheck(c, check.DeepEqualsIn, false, "", simpleStruct{1}, []interface{}{simpleStruct{2}})
+
+	// Struct pointers
+	testCheck(c, check.DeepEqualsIn, true, "", &simpleStruct{1}, []interface{}{&simpleStruct{1}})
+	testCheck(c, check.DeepEqualsIn, false, "", &simpleStruct{1}, []interface{}{&simpleStruct{2}})
+}
+
 func (s *CheckersS) TestHasLen(c *check.C) {
 	testInfo(c, check.HasLen, "HasLen", []string{"obtained", "n"})
 
